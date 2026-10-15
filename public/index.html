@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bio Page - Chia sẻ cảm nghĩ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+  }
+  .container { max-width: 700px; margin: 0 auto; }
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    color: white; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;
+  }
+  header h1 { font-size: 1.8em; }
+  .user-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px; border-radius: 30px;
+    backdrop-filter: blur(10px);
+  }
+  .user-bar .u-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: bold; font-size: 14px;
+  }
+  .user-bar .u-name { color: white; font-weight: 600; font-size: 14px; }
+  .user-bar button {
+    padding: 6px 12px; font-size: 12px; border-radius: 20px;
+    background: rgba(255,255,255,0.25);
+  }
+  .user-bar button:hover { background: rgba(255,255,255,0.4); }
+
+  .card {
+    background: white; border-radius: 16px; padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 20px;
+  }
+
+  .form-group { margin-bottom: 12px; }
+  input[type="text"], input[type="password"], textarea {
+    width: 100%; padding: 12px;
+    border: 2px solid #e0e0e0; border-radius: 10px;
+    font-size: 15px; font-family: inherit;
+    transition: border-color 0.3s;
+  }
+  input:focus, textarea:focus { outline: none; border-color: #667eea; }
+  textarea { resize: vertical; min-height: 80px; }
+  input[type="file"] {
+    padding: 8px; background: #f7f7f7;
+    border-radius: 8px; width: 100%; cursor: pointer;
+  }
+  button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white; border: none; padding: 12px 24px;
+    border-radius: 10px; cursor: pointer;
+    font-size: 15px; font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+  button:active { transform: translateY(0); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+  .auth-wrap { max-width: 420px; margin: 60px auto; }
+  .auth-card {
+    background: white; border-radius: 20px; padding: 35px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .auth-card h2 {
+    text-align: center; margin-bottom: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-size: 1.8em;
+  }
+  .auth-card .sub { text-align: center; color: #888; margin-bottom: 25px; font-size: 14px; }
+  .auth-tabs {
+    display: flex; background: #f0f2f8;
+    padding: 4px; border-radius: 12px; margin-bottom: 20px;
+  }
+  .auth-tabs button {
+    flex: 1; background: none; color: #888;
+    padding: 10px; border-radius: 8px; font-size: 14px;
+  }
+  .auth-tabs button.active {
+    background: white; color: #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transform: none;
+  }
+  .auth-tabs button:hover { transform: none; box-shadow: none; background: rgba(255,255,255,0.5); }
+  .auth-tabs button.active:hover { background: white; }
+  .auth-error {
+    background: #ffeaea; color: #e74c3c;
+    padding: 10px 14px; border-radius: 8px;
+    font-size: 13px; margin-bottom: 12px; display: none;
+  }
+  .auth-error.show { display: block; }
+  .auth-card .btn-full { width: 100%; margin-top: 6px; }
+
+  .post-header { display: flex; align-items: center; margin-bottom: 12px; }
+  .avatar {
+    width: 45px; height: 45px; border-radius: 50%;
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 18px; margin-right: 12px; flex-shrink: 0;
+  }
+  .post-meta { flex: 1; min-width: 0; }
+  .post-name { font-weight: 700; color: #333; }
+  .post-time { font-size: 12px; color: #999; }
+  .del-btn {
+    background: none; color: #e74c3c; padding: 6px 10px;
+    font-size: 13px; border-radius: 8px;
+  }
+  .del-btn:hover { background: #ffeaea; transform: none; box-shadow: none; }
+
+  .post-content { margin-bottom: 12px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+
+  .attachment {
+    display: block; margin: 10px 0; padding: 10px;
+    background: #f7f9ff; border-radius: 10px;
+    border: 1px solid #e0e8ff; color: #5568c9;
+    text-decoration: none; font-size: 14px; word-break: break-all;
+  }
+  .attachment:hover { background: #eef2ff; }
+  .attachment img { max-width: 100%; border-radius: 8px; margin-top: 8px; }
+
+  .actions {
+    display: flex; gap: 15px; align-items: center;
+    padding-top: 12px; border-top: 1px solid #f0f0f0;
+  }
+  .heart-btn {
+    background: none; color: #e74c3c;
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; font-weight: 600; font-size: 14px; border-radius: 20px;
+  }
+  .heart-btn:hover { background: #ffeaea; transform: scale(1.05); }
+  .heart-btn.liked { background: #ffeaea; }
+  .heart-btn.pop { animation: pop 0.4s ease; }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+  .comment-toggle {
+    background: none; color: #667eea;
+    padding: 6px 12px; font-size: 14px; border-radius: 20px;
+  }
+  .comment-toggle:hover { background: #eef2ff; transform: none; box-shadow: none; }
+
+  .comments {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid #f0f0f0; display: none;
+  }
+  .comments.open { display: block; }
+  .comment {
+    background: #f7f9ff; padding: 10px 12px;
+    border-radius: 10px; margin-bottom: 8px; font-size: 14px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .comment .c-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: bold; font-size: 12px; flex-shrink: 0;
+  }
+  .comment .c-body { flex: 1; min-width: 0; }
+  .comment .c-name { font-weight: 700; color: #5568c9; }
+  .comment .c-time { font-size: 11px; color: #999; margin-left: 8px; }
+  .comment .c-text { margin-top: 4px; line-height: 1.5; word-wrap: break-word; }
+  .comment .c-del {
+    background: none; color: #ccc; padding: 2px 6px;
+    font-size: 14px; border-radius: 6px; align-self: flex-start;
+  }
+  .comment .c-del:hover { color: #e74c3c; background: #ffeaea; transform: none; box-shadow: none; }
+
+  .comment-form { display: flex; gap: 8px; margin-top: 10px; }
+  .comment-form input { flex: 1; padding: 8px 12px; font-size: 14px; }
+  .comment-form button { padding: 8px 16px; font-size: 14px; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="auth-wrap hidden">
+  <div class="auth-card">
+    <h2>✨ Bio Page</h2>
+    <p class="sub">Chia sẻ cảm nghĩ của bạn</p>
+
+    <div class="auth-tabs">
+      <button id="tabLogin" class="active" onclick="switchTab('login')">Đăng nhập</button>
+      <button id="tabRegister" onclick="switchTab('register')">Đăng ký</button>
+    </div>
+
+    <div id="authError" class="auth-error"></div>
+
+    <form id="loginForm" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <input type="text" id="loginUser" placeholder="Tên đăng nhập" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <input type="password" id="loginPass" placeholder="Mật khẩu" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-full" id="loginBtn">Đăng nhập</button>
+    </form>
+
+    <form id="registerForm" class="hidden" onsubmit="doRegister(event)">
+      <div class="form-group">
+        <input type="text" id="regDisplay" placeholder="Tên hiển thị" maxlength="50" required>
+      </div>
+      <div class="form-group">
+        <input type="text" id="regUser" placeholder="Tên đăng nhập" maxlength="30" required>
+      </div>
+      <div class="form-group">
+        <input type="password" id="regPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="btn-full" id="regBtn">Tạo tài khoản</button>
+    </form>
+  </div>
+</div>
+
+<div id="appScreen" class="container hidden">
+  <header>
+    <h1>✨ Bio Page</h1>
+    <div class="user-bar">
+      <div class="u-avatar" id="myAvatar"></div>
+      <span class="u-name" id="myName"></span>
+      <button onclick="doLogout()">Đăng xuất</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="form-group">
+      <textarea id="content" placeholder="Bạn đang nghĩ gì?" maxlength="2000"></textarea>
+    </div>
+    <div class="form-group">
+      <input type="file" id="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip">
+    </div>
+    <button onclick="submitPost(event)">🚀 Đăng bài</button>
+  </div>
+
+  <div id="posts"></div>
+</div>
+
+<script>
+const API = '/api';
+let currentUser = null;
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text == null ? '' : text;
+  return div.innerHTML;
+}
+function formatTime(iso) {
+  const d = new Date(iso.replace(' ', 'T') + 'Z');
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return 'Vừa xong';
+  if (diff < 3600) return Math.floor(diff/60) + ' phút trước';
+  if (diff < 86400) return Math.floor(diff/3600) + ' giờ trước';
+  if (diff < 604800) return Math.floor(diff/86400) + ' ngày trước';
+  return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
+}
+function initial(name) { return (name || '?').charAt(0).toUpperCase(); }
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+  document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+  document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+  hideError();
+}
+function showError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg; el.classList.add('show');
+}
+function hideError() {
+  document.getElementById('authError').classList.remove('show');
+}
+
+async function doLogin(e) {
+  e.preventDefault(); hideError();
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Đang đăng nhập...';
+  try {
+    const res = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('loginUser').value.trim(),
+        password: document.getElementById('loginPass').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi đăng nhập');
+    currentUser = data.user;
+    showApp();
+  } catch (err) { showError(err.message); }
+  btn.disabled = false; btn.textContent = 'Đăng nhập';
+}
+
+async function doRegister(e) {
+  e.preventDefault(); hideError();
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true; btn.textContent = 'Đang tạo...';
+  try {
+    const res = await fetch(API + '/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('regUser').value.trim(),
+        password: document.getElementById('regPass').value,
+        displayName: document.getElementById('regDisplay').value.trim()
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi đăng ký');
+    currentUser = data.user;
+    showApp();
+  } catch (err) { showError(err.message); }
+  btn.disabled = false; btn.textContent = 'Tạo tài khoản';
+}
+
+async function doLogout() {
+  await fetch(API + '/auth/logout', { method: 'POST' });
+  currentUser = null;
+  showAuth();
+}
+
+function showAuth() {
+  document.getElementById('authScreen').classList.remove('hidden');
+  document.getElementById('appScreen').classList.add('hidden');
+}
+function showApp() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  const av = document.getElementById('myAvatar');
+  av.textContent = initial(currentUser.display_name);
+  av.style.background = currentUser.avatar_color;
+  document.getElementById('myName').textContent = currentUser.display_name;
+  loadPosts();
+}
+
+function renderFile(p) {
+  if (!p.file_path) return '';
+  const url = p.file_path;
+  const name = escapeHtml(p.file_name || 'Tệp đính kèm');
+  const t = p.file_type || '';
+  if (t.startsWith('image/'))
+    return `<a class="attachment" href="${url}" target="_blank">🖼️ ${name}<br><img src="${url}" alt="${name}"></a>`;
+  if (t.startsWith('video/'))
+    return `<div class="attachment">🎬 ${name}<br><video src="${url}" controls style="max-width:100%;margin-top:8px;border-radius:8px;"></video></div>`;
+  if (t.startsWith('audio/'))
+    return `<div class="attachment">🎵 ${name}<br><audio src="${url}" controls style="width:100%;margin-top:8px;"></audio></div>`;
+  return `<a class="attachment" href="${url}" target="_blank" download>📎 ${name}</a>`;
+}
+
+function renderPost(p) {
+  const avColor = p.avatar_color || '#667eea';
+  const commentsHtml = p.comments.map(c => {
+    const cColor = c.user_color || '#667eea';
+    const canDel = currentUser && c.user_id === currentUser.id;
+    return `
+      <div class="comment">
+        <div class="c-avatar" style="background:${cColor}">${initial(c.name)}</div>
+        <div class="c-body">
+          <div>
+            <span class="c-name">${escapeHtml(c.name)}</span>
+            <span class="c-time">${formatTime(c.created_at)}</span>
+          </div>
+          <div class="c-text">${escapeHtml(c.content)}</div>
+        </div>
+        ${canDel ? `<button class="c-del" onclick="deleteComment(${c.id}, ${p.id})" title="Xóa">✕</button>` : ''}
+      </div>`;
+  }).join('') || '<div style="color:#999;font-size:13px;text-align:center;padding:8px;">Chưa có bình luận</div>';
+
+  const delBtn = p.canDelete
+    ? `<button class="del-btn" onclick="deletePost(${p.id})" title="Xóa bài">🗑️</button>` : '';
+
+  return `
+    <div class="card post" data-id="${p.id}">
+      <div class="post-header">
+        <div class="avatar" style="background:${avColor}">${initial(p.name)}</div>
+        <div class="post-meta">
+          <div class="post-name">${escapeHtml(p.name)}</div>
+          <div class="post-time">${formatTime(p.created_at)}</div>
+        </div>
+        ${delBtn}
+      </div>
+      <div class="post-content">${escapeHtml(p.content)}</div>
+      ${renderFile(p)}
+      <div class="actions">
+        <button class="heart-btn ${p.userLiked ? 'liked' : ''}" onclick="likePost(${p.id}, this)">
+          ${p.userLiked ? '❤️' : '🤍'} <span class="heart-count">${p.hearts}</span>
+        </button>
+        <button class="comment-toggle" onclick="toggleComments(${p.id})">💬 Bình luận (${p.comments.length})</button>
+      </div>
+      <div class="comments" id="comments-${p.id}">
+        <div class="comment-list">${commentsHtml}</div>
+        <div class="comment-form">
+          <input type="text" name="ctext" placeholder="Viết bình luận..." maxlength="500">
+          <button onclick="submitComment(${p.id}, this)">Gửi</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function loadPosts() {
+  const res = await fetch(API + '/posts');
+  if (res.status === 401) { currentUser = null; showAuth(); return; }
+  const posts = await res.json();
+  document.getElementById('posts').innerHTML = posts.map(renderPost).join('');
+}
+
+async function submitPost(e) {
+  const content = document.getElementById('content').value.trim();
+  const file = document.getElementById('file').files[0];
+  if (!content) return alert('Vui lòng nhập nội dung!');
+
+  const btn = e.target;
+  btn.disabled = true; btn.textContent = 'Đang đăng...';
+  const fd = new FormData();
+  fd.append('content', content);
+  if (file) fd.append('file', file);
+
+  try {
+    const res = await fetch(API + '/posts', { method: 'POST', body: fd });
+    if (res.status === 401) { showAuth(); return; }
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+    document.getElementById('content').value = '';
+    document.getElementById('file').value = '';
+    await loadPosts();
+  } catch (err) { alert('Lỗi: ' + err.message); }
+  btn.disabled = false; btn.textContent = '🚀 Đăng bài';
+}
+
+async function deletePost(id) {
+  if (!confirm('Bạn có chắc muốn xóa bài này?')) return;
+  const res = await fetch(`${API}/posts/${id}`, { method: 'DELETE' });
+  if (res.ok) loadPosts();
+  else alert('Không thể xóa');
+}
+
+async function likePost(id, btn) {
+  btn.classList.add('pop');
+  setTimeout(() => btn.classList.remove('pop'), 400);
+  const res = await fetch(`${API}/posts/${id}/hearts`, { method: 'POST' });
+  if (res.status === 401) { alert('Vui lòng đăng nhập để thả tim'); showAuth(); return; }
+  const data = await res.json();
+  btn.querySelector('.heart-count').textContent = data.hearts;
+  btn.classList.add('liked');
+  btn.childNodes[0].textContent = '❤️ ';
+}
+
+function toggleComments(id) {
+  document.getElementById('comments-' + id).classList.toggle('open');
+}
+
+async function submitComment(id, btn) {
+  const form = btn.parentElement;
+  const content = form.querySelector('input[name="ctext"]').value.trim();
+  if (!content) return;
+
+  const res = await fetch(`${API}/posts/${id}/comments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content })
+  });
+  if (res.status === 401) { showAuth(); return; }
+  form.querySelector('input[name="ctext"]').value = '';
+  await loadPosts();
+  document.getElementById('comments-' + id).classList.add('open');
+}
+
+async function deleteComment(id, postId) {
+  if (!confirm('Xóa bình luận này?')) return;
+  const res = await fetch(`${API}/comments/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    await loadPosts();
+    document.getElementById('comments-' + postId).classList.add('open');
+  }
+}
+
+(async function init() {
+  const res = await fetch(API + '/auth/me');
+  const data = await res.json();
+  if (data.user) { currentUser = data.user; showApp(); }
+  else showAuth();
+})();
+
+setInterval(() => { if (currentUser) loadPosts(); }, 15000);
+</script>
+</body>
+</html>
